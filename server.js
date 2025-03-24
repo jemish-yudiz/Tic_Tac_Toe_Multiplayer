@@ -46,22 +46,11 @@ app.get("/api/games/:gameId", async (req, res) => {
   try {
     const gameId = req.params.gameId;
 
-    // Try Redis first
-    const cachedGame = await redisClient.get(`game:${gameId}`);
-    if (cachedGame) {
-      return res.json(JSON.parse(cachedGame));
-    }
-
     // If not in Redis, check MongoDB
     const game = await Game.findOne({ gameId });
     if (!game) {
       return res.status(404).json({ error: "Game not found" });
     }
-
-    // Cache the result in Redis
-    await redisClient.set(`game:${gameId}`, JSON.stringify(game), {
-      EX: 900, // 15 minutes
-    });
 
     res.json(game);
   } catch (error) {
@@ -242,11 +231,6 @@ async function createNewGame() {
       gameState: games[gameId].gameState,
     });
     await newGame.save();
-
-    // Cache game in Redis with expiration time (24 hours)
-    await redisClient.set(`game:${gameId}`, JSON.stringify(games[gameId]), {
-      EX: 900, // 15 minutes
-    });
   } catch (error) {
     console.error("Error saving game:", error);
   }
@@ -272,11 +256,6 @@ async function resetGame(gameId) {
           winner: null,
         }
       );
-
-      // Update in Redis
-      await redisClient.set(`game:${gameId}`, JSON.stringify(games[gameId]), {
-        EX: 900, // 15 minutes
-      });
     } catch (error) {
       console.error("Error updating game:", error);
     }
@@ -364,11 +343,6 @@ io.on("connection", (socket) => {
         { gameId },
         { players: games[gameId].players }
       );
-
-      // Update in Redis
-      await redisClient.set(`game:${gameId}`, JSON.stringify(games[gameId]), {
-        EX: 900, // 15 minutes
-      });
     } catch (error) {
       console.error("Error updating player:", error);
     }
@@ -409,25 +383,19 @@ io.on("connection", (socket) => {
 
     // Check if the game exists
     if (!games[gameId]) {
-      // Try to find it in Redis first
+      // Try to find it in MongoDB
       try {
-        const cachedGame = await redisClient.get(`game:${gameId}`);
-        if (cachedGame) {
-          games[gameId] = JSON.parse(cachedGame);
+        const dbGame = await Game.findOne({ gameId });
+        if (dbGame) {
+          games[gameId] = {
+            board: dbGame.board,
+            players: dbGame.players,
+            currentTurn: dbGame.currentTurn,
+            gameState: dbGame.gameState,
+          };
         } else {
-          // Try to find it in MongoDB
-          const dbGame = await Game.findOne({ gameId });
-          if (dbGame) {
-            games[gameId] = {
-              board: dbGame.board,
-              players: dbGame.players,
-              currentTurn: dbGame.currentTurn,
-              gameState: dbGame.gameState,
-            };
-          } else {
-            socket.emit("error", { message: "Game not found" });
-            return;
-          }
+          socket.emit("error", { message: "Game not found" });
+          return;
         }
       } catch (error) {
         console.error("Error retrieving game:", error);
@@ -477,11 +445,6 @@ io.on("connection", (socket) => {
           gameState: games[gameId].gameState,
         }
       );
-
-      // Update in Redis
-      await redisClient.set(`game:${gameId}`, JSON.stringify(games[gameId]), {
-        EX: 900, // 15 minutes
-      });
     } catch (error) {
       console.error("Error updating game/player:", error);
     }
@@ -583,11 +546,6 @@ io.on("connection", (socket) => {
             winner: result.winner,
           }
         );
-
-        // Update in Redis
-        await redisClient.set(`game:${gameId}`, JSON.stringify(game), {
-          EX: 900, // 15 minutes
-        });
       } catch (error) {
         console.error("Error updating game/player stats:", error);
       }
@@ -620,11 +578,6 @@ io.on("connection", (socket) => {
             currentTurn: game.currentTurn,
           }
         );
-
-        // Update in Redis
-        await redisClient.set(`game:${gameId}`, JSON.stringify(game), {
-          EX: 900, // 15 minutes
-        });
       } catch (error) {
         console.error("Error updating game:", error);
       }
@@ -701,9 +654,6 @@ io.on("connection", (socket) => {
 
           // Update game state in MongoDB
           await Game.findOneAndUpdate({ gameId }, { gameState: "finished" });
-
-          // Remove from Redis (or update it)
-          await redisClient.del(`game:${gameId}`);
         } catch (error) {
           console.error("Error updating disconnected player:", error);
         }
