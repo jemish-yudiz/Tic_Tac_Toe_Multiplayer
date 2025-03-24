@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>Classic Tic Tac Toe Multiplayer</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Classic Tic Tac Toe</h1>
+      <div id="message" class="message">Welcome to Tic Tac Toe!</div>
+
+      <div id="gameInfo" class="game-info" style="display: none">
+        <div id="playerX" class="player-info">
+          <div class="player-symbol">X</div>
+          <div class="player-label">Player 1</div>
+        </div>
+        <div id="playerO" class="player-info">
+          <div class="player-symbol">O</div>
+          <div class="player-label">Player 2</div>
+        </div>
+      </div>
+
+      <div class="game-controls">
+        <button id="createGameBtn">Create New Game</button>
+        <div class="join-game">
+          <input type="text" id="gameIdInput" placeholder="Enter Game ID" />
+          <button id="joinGameBtn">Join Game</button>
+        </div>
+      </div>
+
+      <div id="gameBoard" class="game-board"></div>
+
+      <button id="resetBtn" style="display: none">Start New Game</button>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="index.js"></script>
+  </body>
+</html>
