@@ -1,0 +1,2 @@
+# TicTacToe_Game
+This is a simple implementation of the classic Tic-Tac-Toe game built using HTML, CSS, and JavaScript. The game provides a user-friendly interface where players can take turns marking X or O on a 3x3 grid until one player wins or the game ends in a draw. It includes interactive features such as highlighting the winning combination, displaying the current player's turn, and providing a reset option to play again. The project showcases fundamental web development skills and serves as a fun way to enjoy the timeless game of Tic-Tac-Toe.
