@@ -20,6 +20,12 @@
       <h1>Classic Tic Tac Toe</h1>
       <div id="message" class="message">Welcome to Tic Tac Toe!</div>
 
+      <div id="playerProfile" class="player-profile">
+        <input type="text" id="usernameInput" placeholder="Your username" />
+        <input type="password" id="passwordInput" placeholder="Your password" />
+        <button id="saveUsernameBtn">Save</button>
+      </div>
+
       <div id="gameInfo" class="game-info" style="display: none">
         <div id="playerX" class="player-info">
           <div class="player-symbol">X</div>
@@ -31,8 +37,10 @@
         </div>
       </div>
 
+      <div id="createGameBtn">
+        <button>Create New Game</button>
+      </div>
       <div class="game-controls">
-        <button id="createGameBtn">Create New Game</button>
         <div class="join-game">
           <input type="text" id="gameIdInput" placeholder="Enter Game ID" />
           <button id="joinGameBtn">Join Game</button>
@@ -42,6 +50,29 @@
       <div id="gameBoard" class="game-board"></div>
 
       <button id="resetBtn" style="display: none">Start New Game</button>
+
+      <div id="playerStats" class="player-stats" style="display: none">
+        <h3>Player Stats</h3>
+        <div id="playerUsername" class="player-username">Anonymous</div>
+        <div class="stats-container">
+          <div class="stat">
+            <span>Games</span>
+            <span id="statGames">0</span>
+          </div>
+          <div class="stat">
+            <span>Wins</span>
+            <span id="statWins">0</span>
+          </div>
+          <div class="stat">
+            <span>Losses</span>
+            <span id="statLosses">0</span>
+          </div>
+          <div class="stat">
+            <span>Draws</span>
+            <span id="statDraws">0</span>
+          </div>
+        </div>
+      </div>
     </div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="index.js"></script>
